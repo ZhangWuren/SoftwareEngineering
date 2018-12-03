@@ -2,6 +2,7 @@
 #include "algorithm"
 #include "fstream"
 using namespace std;
+ofstream OutFile("sudoku.txt");
 
 class CRow
 { //数独的一行
@@ -45,18 +46,18 @@ void CRow::TranslateAndPrintRow(int transNumber)
     }
     for (int i = 0; i < 9; i++)
     {
-        cout << __trow[i] << " ";
+        OutFile << __trow[i] << " ";
     }
-    cout << endl;
+    OutFile << endl;
 }
 
 int main(int argc, char *argv[])
 {
+    OutFile.clear();
     int sudokuNumber = 0;
     int TranslateArray1[3] = {1, 4, 7};
     int TranslateArray2[3] = {2, 5, 8};
     CRow crow;
-
     cin >> sudokuNumber;
     for (int i = 0; i <= sudokuNumber / 36; i++)
     {
@@ -85,10 +86,11 @@ int main(int argc, char *argv[])
                 next_permutation(TranslateArray1, TranslateArray1 + 3);
             }
             next_permutation(TranslateArray2, TranslateArray2 + 3);
-            cout << endl;
+            OutFile << endl;
         }
+
         crow.NextRow();
     }
-
+    OutFile.close();
     return 0;
 }
