@@ -54,11 +54,15 @@ void CRow::TranslateAndPrintRow(int transNumber)
 int main(int argc, char *argv[])
 {
     OutFile.clear();
+
+    cout << argc << endl;
+
     int sudokuNumber = 0;
     int TranslateArray1[3] = {1, 4, 7};
     int TranslateArray2[3] = {2, 5, 8};
     CRow crow;
-    cin >> sudokuNumber;
+
+    sudokuNumber = atoi(argv[2]);
     for (int i = 0; i <= sudokuNumber / 36; i++)
     {
         int Times = 0;
@@ -88,7 +92,6 @@ int main(int argc, char *argv[])
             next_permutation(TranslateArray2, TranslateArray2 + 3);
             OutFile << endl;
         }
-
         crow.NextRow();
     }
     OutFile.close();
