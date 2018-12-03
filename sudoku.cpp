@@ -1,6 +1,7 @@
 #include "iostream"
 #include "algorithm"
 #include "fstream"
+#include "string.h"
 using namespace std;
 ofstream OutFile("sudoku.txt");
 
@@ -46,23 +47,43 @@ void CRow::TranslateAndPrintRow(int transNumber)
     }
     for (int i = 0; i < 9; i++)
     {
-        OutFile << __trow[i] << " ";
+        if (i != 8)
+        {
+            OutFile << __trow[i] << " ";
+        }
+        else
+        {
+            OutFile << __trow[i];
+        }
     }
-    OutFile << endl;
 }
 
-int main(int argc, char *argv[])
+bool GenerateSudoku(char *csudokuNumber)
 {
-    OutFile.clear();
+    for (int i = 0; csudokuNumber[i] != '\0'; i++)
+    {
+        if (csudokuNumber[i] < '0' || csudokuNumber[i] > '9')
+        {
+            cout << "Please enter right number" << endl;
+            return false;
+        }
+    }
 
-    cout << argc << endl;
+    int sudokuNumber = atoi(csudokuNumber);
 
-    int sudokuNumber = 0;
+    if (sudokuNumber > 1000000 || sudokuNumber <= 0)
+    {
+        cout << "Please input number between 0 and 1,000,000" << endl;
+        return false;
+    }
+
+    int count = 0;
     int TranslateArray1[3] = {1, 4, 7};
     int TranslateArray2[3] = {2, 5, 8};
+    int TranslateArray3[3] = {0, 3, 6};
     CRow crow;
 
-    sudokuNumber = atoi(argv[2]);
+    count = sudokuNumber;
     for (int i = 0; i <= sudokuNumber / 36; i++)
     {
         int Times = 0;
@@ -76,24 +97,73 @@ int main(int argc, char *argv[])
         }
         for (int j = 0; j < Times; j++)
         {
-            crow.TranslateAndPrintRow(0);
-            crow.TranslateAndPrintRow(3);
-            crow.TranslateAndPrintRow(6);
-            crow.TranslateAndPrintRow(TranslateArray1[0]);
-            crow.TranslateAndPrintRow(TranslateArray1[1]);
-            crow.TranslateAndPrintRow(TranslateArray1[2]);
-            crow.TranslateAndPrintRow(TranslateArray2[0]);
-            crow.TranslateAndPrintRow(TranslateArray2[1]);
-            crow.TranslateAndPrintRow(TranslateArray2[2]);
+            count--;
+            for (int k = 0; k < 3; k++)
+            {
+                crow.TranslateAndPrintRow(TranslateArray3[k]);
+                OutFile << endl;
+            }
+            for (int k = 0; k < 3; k++)
+            {
+                crow.TranslateAndPrintRow(TranslateArray1[k]);
+                OutFile << endl;
+            }
+            for (int k = 0; k < 3; k++)
+            {
+                if (k != 2)
+                {
+                    crow.TranslateAndPrintRow(TranslateArray2[k]);
+                    OutFile << endl;
+                }
+                else
+                {
+                    crow.TranslateAndPrintRow(TranslateArray2[k]);
+                }
+            }
             if (j % 6 == 5)
             {
                 next_permutation(TranslateArray1, TranslateArray1 + 3);
             }
             next_permutation(TranslateArray2, TranslateArray2 + 3);
-            OutFile << endl;
+
+            if (count != 0)
+            {
+                OutFile << endl;
+                OutFile << endl;
+            }
         }
         crow.NextRow();
     }
+
+    cout << "Already Generate right sudoku in sudoku.txt" << endl;
+    return true;
+}
+
+bool SovleSudoku(char *filename)
+{
+
+}
+
+int main(int argc, char *argv[])
+{
+    OutFile.clear();
+
+    if (strcmp(argv[2], "-c"))
+    {
+        GenerateSudoku(argv[2]);
+    }
+    else
+    {
+        if(strcmp(argv[2], "-s"))
+        {
+            SovleSudoku(argv[2]);
+        }
+        else
+        {
+            cout<<"Please enter right parameter"<<endl;
+        }
+    }
+
     OutFile.close();
     return 0;
 }
