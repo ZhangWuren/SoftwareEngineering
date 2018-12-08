@@ -2,15 +2,12 @@
 #include "algorithm"
 #include "fstream"
 #include "string.h"
+#include "string"
 using namespace std;
-ofstream OutFile("sudoku.txt");
+ofstream outFile("sudoku.txt");
 
 class CRow
 { //数独的一行
-  private:
-    unsigned short __row[9];
-    unsigned short __trow[9];
-
   public:
     CRow()
     {
@@ -32,6 +29,23 @@ class CRow
     };
     void NextRow();
     void TranslateAndPrintRow(int transNumber);
+
+  private:
+    unsigned short __row[9];
+    unsigned short __trow[9];
+};
+
+class Grid
+{
+  public:
+    unsigned short __grid[9][9];
+    Grid(){};
+};
+
+class Sudoku
+{
+  public:
+    Grid __sudoku[9][9];
 };
 
 void CRow::NextRow()
@@ -49,11 +63,11 @@ void CRow::TranslateAndPrintRow(int transNumber)
     {
         if (i != 8)
         {
-            OutFile << __trow[i] << " ";
+            outFile << __trow[i] << " ";
         }
         else
         {
-            OutFile << __trow[i];
+            outFile << __trow[i];
         }
     }
 }
@@ -101,19 +115,19 @@ bool GenerateSudoku(char *csudokuNumber)
             for (int k = 0; k < 3; k++)
             {
                 crow.TranslateAndPrintRow(TranslateArray3[k]);
-                OutFile << endl;
+                outFile << endl;
             }
             for (int k = 0; k < 3; k++)
             {
                 crow.TranslateAndPrintRow(TranslateArray1[k]);
-                OutFile << endl;
+                outFile << endl;
             }
             for (int k = 0; k < 3; k++)
             {
                 if (k != 2)
                 {
                     crow.TranslateAndPrintRow(TranslateArray2[k]);
-                    OutFile << endl;
+                    outFile << endl;
                 }
                 else
                 {
@@ -128,8 +142,8 @@ bool GenerateSudoku(char *csudokuNumber)
 
             if (count != 0)
             {
-                OutFile << endl;
-                OutFile << endl;
+                outFile << endl;
+                outFile << endl;
             }
         }
         crow.NextRow();
@@ -139,31 +153,44 @@ bool GenerateSudoku(char *csudokuNumber)
     return true;
 }
 
-bool SovleSudoku(char *filename)
+bool SovleSudoku(char filename[])
 {
-
+    int sudokuInput;
+    ifstream readFile("E:\\Documents\\SoftwareEngineering\\in.txt");
+    for (int i = 0; i < 9; i++)
+    {
+        for (int j = 0; j < 9; j++)
+        {
+            readFile >> sudokuInput;
+            cout << sudokuInput << " ";
+        }
+        cout << endl;
+    }
+    readFile.close();
+    return true;
 }
 
 int main(int argc, char *argv[])
 {
-    OutFile.clear();
+    outFile.clear();
 
-    if (strcmp(argv[2], "-c"))
+    cout << argv[1] << endl;
+    if (!strcmp(argv[1], "-c"))
     {
         GenerateSudoku(argv[2]);
     }
     else
     {
-        if(strcmp(argv[2], "-s"))
+        if (!strcmp(argv[1], "-s"))
         {
             SovleSudoku(argv[2]);
         }
         else
         {
-            cout<<"Please enter right parameter"<<endl;
+            cout << "Please enter right parameter" << endl;
         }
     }
 
-    OutFile.close();
+    outFile.close();
     return 0;
 }
