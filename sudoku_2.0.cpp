@@ -1,18 +1,29 @@
 #include "iostream"
 #include "algorithm"
-#include "fstream"
 #include "string.h"
 #include "string"
 #include "time.h"
 using namespace std;
-ofstream outFile("sudoku2.txt");
+FILE *fp;
 char mould[36][9][9];
 
 class CRow
 {
   public:
-    char __row[9] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'};
+    char __row[9];
     char __trow[9];
+    CRow()
+    {
+        __row[0] = 'a';
+        __row[1] = 'b';
+        __row[2] = 'c';
+        __row[3] = 'd';
+        __row[4] = 'e';
+        __row[5] = 'f';
+        __row[6] = 'g';
+        __row[7] = 'h';
+        __row[8] = 'i';
+    }
     void TranslateRow(const int transNumber);
 };
 
@@ -68,8 +79,8 @@ bool GenerateSudoku(const char *csudokuNumber)
         return false;
     }
 
-    int sudokuResult[9][9];
-    int sudokurow[9] = {6, 1, 2, 3, 4, 5, 7, 8, 9};
+    char sudokuResult[9][9];
+    char sudokurow[9] = {'6', '1', '2', '3', '4', '5', '7', '8', '9'};
 
     for (int i = 0; i <= sudokuNumber / 36; i++)
     {
@@ -118,18 +129,19 @@ bool GenerateSudoku(const char *csudokuNumber)
                         sudokuResult[p][q] = sudokurow[8];
                         break;
                     }
-                    //cout<< sudokuResult[p][q] << " ";
-                    // if (q != 8)
-                    // {
-                    //     outFile << sudokuResult[p][q] << " ";
-                    // }
-                    // else
-                    // {
-                    //     outFile << sudokuResult[p][q] << endl;
-                    // }
+                    if (q != 8)
+                    {
+                        fputc(sudokuResult[p][q],fp);
+                        fputc(' ',fp);
+                    }
+                    else
+                    {
+                       fputc(sudokuResult[p][q],fp);
+                       fputc('\n',fp);
+                    }
                 }
             }
-            outFile << endl;
+            fputc('\n',fp);
         }
         next_permutation(sudokurow, sudokurow + 9);
     }
@@ -147,8 +159,8 @@ int main(int argc, char const *argv[])
     clock_t startT, finishT;
     double totalTime;
     startT = clock();
-    outFile.clear();
 
+    fp = fopen("sudoku.txt", "w");
     // cout << argv[1] << endl;
     // if (!strcmp(argv[1], "-c"))
     // {
@@ -166,9 +178,9 @@ int main(int argc, char const *argv[])
     //     }
     // }
 
-    GenerateSudoku("1000000");
+    GenerateSudoku("100");
 
-    outFile.close();
+    fclose(fp);
     finishT = clock();
     totalTime = (double)(finishT - startT) / CLOCKS_PER_SEC;
     cout << "The total time is " << totalTime << "s!" << endl;
