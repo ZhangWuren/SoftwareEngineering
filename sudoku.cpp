@@ -3,8 +3,12 @@
 #include "fstream"
 #include "string.h"
 #include "string"
+#include "time.h"
 using namespace std;
 ofstream outFile("sudoku.txt");
+
+clock_t startT, finishT;
+double totalTime;
 
 class CRow
 { //数独的一行
@@ -172,6 +176,7 @@ bool SovleSudoku(char filename[])
 
 int main(int argc, char *argv[])
 {
+    startT = clock();
     outFile.clear();
 
     cout << argv[1] << endl;
@@ -192,5 +197,8 @@ int main(int argc, char *argv[])
     }
 
     outFile.close();
+    finishT = clock();
+    totalTime = (double)(finishT - startT) / CLOCKS_PER_SEC;
+    cout << "The total time is " << totalTime << "s!" << endl;
     return 0;
 }
