@@ -63,14 +63,6 @@ void CRow::TranslateAndPrintRow(int transNumber)
     }
     for (int i = 0, j = 0; i < 9; i++)
     {
-        // if (i != 8)
-        // {
-        //     outFile << __trow[i] << " ";
-        // }
-        // else
-        // {
-        //     outFile << __trow[i];
-        // }
         if (i != 8)
         {
             rowString[j] = __trow[i] + '0';
@@ -129,13 +121,11 @@ bool GenerateSudoku(char *csudokuNumber)
             for (int k = 0; k < 3; k++)
             {
                 crow.TranslateAndPrintRow(TranslateArray3[k]);
-                //outFile << endl;
                 fputc('\n', fp);
             }
             for (int k = 0; k < 3; k++)
             {
                 crow.TranslateAndPrintRow(TranslateArray1[k]);
-                //outFile << endl;
                 fputc('\n', fp);
             }
             for (int k = 0; k < 3; k++)
@@ -143,7 +133,6 @@ bool GenerateSudoku(char *csudokuNumber)
                 if (k != 2)
                 {
                     crow.TranslateAndPrintRow(TranslateArray2[k]);
-                    //outFile << endl;
                     fputc('\n', fp);
                 }
                 else
