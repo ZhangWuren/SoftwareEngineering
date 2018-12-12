@@ -5,10 +5,7 @@
 #include "string"
 #include "time.h"
 using namespace std;
-ofstream outFile("sudoku.txt");
-
-clock_t startT, finishT;
-double totalTime;
+FILE *fp;
 
 class CRow
 { //数独的一行
@@ -59,11 +56,12 @@ void CRow::NextRow()
 
 void CRow::TranslateAndPrintRow(int transNumber)
 {
+    char rowString[19];
     for (int i = 0; i < 9; i++)
     {
         __trow[(i + transNumber) % 9] = __row[i];
     }
-    for (int i = 0; i < 9; i++)
+    for (int i = 0, j = 0; i < 9; i++)
     {
         // if (i != 8)
         // {
@@ -73,7 +71,19 @@ void CRow::TranslateAndPrintRow(int transNumber)
         // {
         //     outFile << __trow[i];
         // }
+        if (i != 8)
+        {
+            rowString[j] = __trow[i] + '0';
+            rowString[j + 1] = ' ';
+            j += 2;
+        }
+        else
+        {
+            rowString[j] = __trow[i] + '0';
+            rowString[j + 1] = '\0';
+        }
     }
+    fputs(rowString, fp);
 }
 
 bool GenerateSudoku(char *csudokuNumber)
@@ -120,11 +130,13 @@ bool GenerateSudoku(char *csudokuNumber)
             {
                 crow.TranslateAndPrintRow(TranslateArray3[k]);
                 //outFile << endl;
+                fputc('\n', fp);
             }
             for (int k = 0; k < 3; k++)
             {
                 crow.TranslateAndPrintRow(TranslateArray1[k]);
                 //outFile << endl;
+                fputc('\n', fp);
             }
             for (int k = 0; k < 3; k++)
             {
@@ -132,6 +144,7 @@ bool GenerateSudoku(char *csudokuNumber)
                 {
                     crow.TranslateAndPrintRow(TranslateArray2[k]);
                     //outFile << endl;
+                    fputc('\n', fp);
                 }
                 else
                 {
@@ -146,8 +159,8 @@ bool GenerateSudoku(char *csudokuNumber)
 
             if (count != 0)
             {
-                // outFile << endl;
-                // outFile << endl;
+                fputc('\n', fp);
+                fputc('\n', fp);
             }
         }
         crow.NextRow();
@@ -176,8 +189,11 @@ bool SovleSudoku(char filename[])
 
 int main(int argc, char *argv[])
 {
+    clock_t startT, finishT;
+    double totalTime;
     startT = clock();
-    outFile.clear();
+
+    fp = fopen("sudoku.txt", "w");
 
     cout << argv[1] << endl;
     if (!strcmp(argv[1], "-c"))
@@ -196,7 +212,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    outFile.close();
     finishT = clock();
     totalTime = (double)(finishT - startT) / CLOCKS_PER_SEC;
     cout << "The total time is " << totalTime << "s!" << endl;
