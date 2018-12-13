@@ -6,6 +6,7 @@
 #include "time.h"
 using namespace std;
 FILE *fp;
+int resultNumber;
 
 class CRow
 { //数独的一行
@@ -34,19 +35,6 @@ class CRow
   private:
     unsigned short __row[9];
     unsigned short __trow[9];
-};
-
-class Grid
-{
-  public:
-    unsigned short __grid[9][9];
-    Grid(){};
-};
-
-class Sudoku
-{
-  public:
-    Grid __sudoku[9][9];
 };
 
 void CRow::NextRow()
@@ -78,8 +66,32 @@ void CRow::TranslateAndPrintRow(int transNumber)
     fputs(rowString, fp);
 }
 
+bool isOK(int (*sudoku)[9], int x, int y, int number)
+{
+    for (int i = 0; i < 9; i++)
+    {
+        if (sudoku[x][i] == number)
+            return false;
+    }
+    for (int i = 0; i < 9; i++)
+    {
+        if (sudoku[i][y] == number)
+            return false;
+    }
+    for (int i = (x / 3) * 3; i < (x / 3 + 1) * 3; i++)
+    {
+        for (int j = (y / 3) * 3; j < (y / 3 + 1) * 3; j++)
+        {
+            if (sudoku[i][j] == number)
+                return false;
+        }
+    }
+    return true;
+}
+
 bool GenerateSudoku(char *csudokuNumber)
 {
+    fp = fopen("sudoku.txt", "w");
     for (int i = 0; csudokuNumber[i] != '\0'; i++)
     {
         if (csudokuNumber[i] < '0' || csudokuNumber[i] > '9')
@@ -159,20 +171,102 @@ bool GenerateSudoku(char *csudokuNumber)
     return true;
 }
 
-bool SovleSudoku(char filename[])
+bool search(int (*sudoku)[9], int order, int number)
 {
-    int sudokuInput;
-    ifstream readFile("E:\\Documents\\SoftwareEngineering\\in.txt");
+    int copy[9][9];
+    int *c = (int *)copy;
+    int x = order / 9;
+    int y = order % 9;
     for (int i = 0; i < 9; i++)
     {
         for (int j = 0; j < 9; j++)
         {
-            readFile >> sudokuInput;
-            cout << sudokuInput << " ";
+            copy[i][j] = sudoku[i][j];
         }
-        cout << endl;
     }
-    readFile.close();
+
+    if (order < 0)
+        resultNumber = 0;
+
+    if (order >= 0)
+    {
+        copy[x][y] = number;
+    }
+    if (resultNumber >= 1)
+    {
+        return 0;
+    }
+
+    while (*(c + order))
+    {
+        order++;
+
+        if (order > 80)
+        {
+            resultNumber++;
+            for (int i = 0; i < 9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    cout << copy[i][j] << " ";
+                }
+                cout << endl;
+            }
+            return 0;
+        }
+    }
+
+    for (int i = 1; i <= 9; i++)
+    {
+        x = order / 9;
+        y = order % 9;
+        if (isOK(copy, x, y, i))
+        {
+            search(copy, order, i);
+        }
+    }
+    return -1;
+}
+
+bool SovleSudoku(char filename[])
+{
+    int inputSudoku[81];
+    int inputSudokuArr[9][9];
+    FILE *fpInput;
+    fpInput = fopen(filename, "r");
+    FILE *fpOutput;
+    fpOutput = fopen("sudoku.txt", "w");
+
+    while (1)
+    {
+        char ch;
+        for (int i = 0; i < 81;)
+        {
+            ch = fgetc(fpInput);
+            if (ch == -1)
+                break;
+            if (ch >= '0' && ch <= '9')
+            {
+                inputSudoku[i] = ch - '0';
+                i++;
+            }
+        }
+
+        if (ch == -1)
+        {
+            break;
+        }
+
+        for (int i = 0, k = 0; i < 9; i++)
+        {
+            for (int j = 0; j < 9; j++)
+            {
+                inputSudokuArr[i][j] = inputSudoku[k];
+                k++;
+            }
+        }
+        search(inputSudokuArr, -1, 0);
+    }
     return true;
 }
 
@@ -181,8 +275,6 @@ int main(int argc, char *argv[])
     clock_t startT, finishT;
     double totalTime;
     startT = clock();
-
-    fp = fopen("sudoku.txt", "w");
 
     cout << argv[1] << endl;
     if (!strcmp(argv[1], "-c"))
@@ -201,6 +293,7 @@ int main(int argc, char *argv[])
         }
     }
 
+    fclose(fp);
     finishT = clock();
     totalTime = (double)(finishT - startT) / CLOCKS_PER_SEC;
     cout << "The total time is " << totalTime << "s!" << endl;
