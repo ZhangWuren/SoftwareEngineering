@@ -172,7 +172,7 @@ bool GenerateSudoku(char *csudokuNumber)
     return true;
 }
 
-void PrintSokudu(int sudoku[][9])
+void PrintSudoku(int sudoku[][9])
 {
     for (int k = 0; k < 9; k++)
     {
@@ -199,7 +199,7 @@ void PrintSokudu(int sudoku[][9])
     }
 }
 
-bool search(int sudoku[][9], int order, int number)
+int search(int sudoku[][9], int order, int number)
 {
     int copy[9][9];
     int *copyPoint = (int *)copy;
@@ -232,7 +232,7 @@ bool search(int sudoku[][9], int order, int number)
         if (order > 80)
         {
             searchFlag = 1;
-            PrintSokudu(copy);
+            PrintSudoku(copy);
             return 0;
         }
     }
