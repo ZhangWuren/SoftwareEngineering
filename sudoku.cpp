@@ -12,7 +12,7 @@ int searchFlag = 0;
 class CRow
 { //数独的一行
   public:
-    CRow()
+    CRow() //构造函数将第一行设置为6 1 2 3 4 5 7 8 9
     {
         __row[0] = 6;
         __trow[0] = 6;
@@ -30,12 +30,11 @@ class CRow
             }
         }
     };
-    void NextRow();
-    void TranslateAndPrintRow(int transNumber);
-
+    void NextRow();                             //对__row[] 进行一次排列
+    void TranslateAndPrintRow(int transNumber); //将__row[] 平移transNumber格 //结果赋值给__trow[] 并输出到文件
   private:
-    unsigned short __row[9];
-    unsigned short __trow[9];
+    unsigned short __row[9];  //初始行，平移的模板
+    unsigned short __trow[9]; //平移后的行
 };
 
 void CRow::NextRow()
@@ -92,10 +91,12 @@ bool isOK(int (*sudoku)[9], int x, int y, int number)
 
 bool GenerateSudoku(char *csudokuNumber)
 {
-    fp = fopen("sudoku.txt", "w");
+    fp = fopen("sudoku.txt", "w"); //打开sudoku.txt
+
+    //判断输入合法性
     for (int i = 0; csudokuNumber[i] != '\0'; i++)
     {
-        if (csudokuNumber[i] < '0' || csudokuNumber[i] > '9')
+        if (csudokuNumber[i] < '0' || csudokuNumber[i] > '9') //非数字
         {
             cout << "Please enter right number" << endl;
             return false;
@@ -103,24 +104,22 @@ bool GenerateSudoku(char *csudokuNumber)
     }
 
     int sudokuNumber = atoi(csudokuNumber);
-
-    if (sudokuNumber > 1000000 || sudokuNumber <= 0)
+    if (sudokuNumber > 1000000 || sudokuNumber <= 0) //不合法数字
     {
         cout << "Please input number between 0 and 1,000,000" << endl;
         return false;
     }
 
-    int count = 0;
-    int TranslateArray1[3] = {1, 4, 7};
-    int TranslateArray2[3] = {2, 5, 8};
-    int TranslateArray3[3] = {0, 3, 6};
+    int count = sudokuNumber;           //记录还未生成的数独个数
+    int TranslateArray1[3] = {1, 4, 7}; //四五六行平移的格数
+    int TranslateArray2[3] = {2, 5, 8}; //七八九行平移的格数
+    int TranslateArray3[3] = {0, 3, 6}; //一二三行平移的格数
     CRow crow;
 
-    count = sudokuNumber;
-    for (int i = 0; i <= sudokuNumber / 36; i++)
-    {
-        int Times = 0;
-        if (i < sudokuNumber / 36)
+    for (int i = 0; i <= sudokuNumber / 36; i++) //每个全排列的行可以生成36个不同的数独
+    {                                            //故需要循环sudokuNumber/36次
+        int Times = 0;                           //Times用来判断对应全排列的行需要生成多少个不同的数独
+        if (i < sudokuNumber / 36)               //除了最后一次循环未sudokuNumber%36次，别的循环都为36次
         {
             Times = 36;
         }
@@ -130,18 +129,18 @@ bool GenerateSudoku(char *csudokuNumber)
         }
         for (int j = 0; j < Times; j++)
         {
-            count--;
-            for (int k = 0; k < 3; k++)
+            count--;                    //未生成数独个数-1
+            for (int k = 0; k < 3; k++) //生成一二三行
             {
                 crow.TranslateAndPrintRow(TranslateArray3[k]);
                 fputc('\n', fp);
             }
-            for (int k = 0; k < 3; k++)
+            for (int k = 0; k < 3; k++) //生成四五六行
             {
                 crow.TranslateAndPrintRow(TranslateArray1[k]);
                 fputc('\n', fp);
             }
-            for (int k = 0; k < 3; k++)
+            for (int k = 0; k < 3; k++) //生成七八九行
             {
                 if (k != 2)
                 {
@@ -153,6 +152,8 @@ bool GenerateSudoku(char *csudokuNumber)
                     crow.TranslateAndPrintRow(TranslateArray2[k]);
                 }
             }
+
+            //变换 四五六 、 六七八行
             if (j % 6 == 5)
             {
                 next_permutation(TranslateArray1, TranslateArray1 + 3);
@@ -201,49 +202,54 @@ void PrintSudoku(int sudoku[][9])
 
 int search(int sudoku[][9], int order, int number)
 {
-    int copy[9][9];
-    int *copyPoint = (int *)copy;
-    int x = order / 9;
+    //sudoku[][9]为递归的数组
+    //order为当前要设置的格子在数独中的顺序
+    //number为要对当前格子填下的数字
+
+    //递归函数
+    int csudoku[9][9]; //辅助数组，递归操作改变的是这个辅助数组，使得回溯时不需要再变动原数组，只需要将这个数组释放
+    int *csudokuPoint = (int *)csudoku;
+    int x = order / 9; //根据顺序转化为坐标
     int y = order % 9;
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < 9; i++) //将递归的数组赋值给辅助数组
     {
         for (int j = 0; j < 9; j++)
         {
-            copy[i][j] = sudoku[i][j];
+            csudoku[i][j] = sudoku[i][j];
         }
     }
 
-    if (order < 0)
-        searchFlag = 0;
+    if (order < 0)      //初始化，开始递归
+        searchFlag = 0; //结束标志，0未结束，1结束
 
-    if (order >= 0)
+    if (order >= 0) //将number赋值到csudoku中的对应位置
     {
-        copy[x][y] = number;
+        csudoku[x][y] = number;
     }
-    if (searchFlag)
+    if (searchFlag) //判断是否结束递归
     {
         return 0;
     }
 
-    while (*(copyPoint + order))
+    //搜索下一个为0的格子的顺序，即目标格
+    while (*(csudokuPoint + order) != 0)
     {
         order++;
-
-        if (order > 80)
+        if (order > 80)//如果顺序大于80，则表示所有格子都已经填满，设置searchFlag为1，打印结果
         {
             searchFlag = 1;
-            PrintSudoku(copy);
+            PrintSudoku(csudoku);
             return 0;
         }
     }
 
-    for (int i = 1; i <= 9; i++)
+    for (int i = 1; i <= 9; i++)//对目标格填1~9
     {
-        x = order / 9;
+        x = order / 9;//根据order获得目标格坐标
         y = order % 9;
-        if (isOK(copy, x, y, i))
+        if (isOK(csudoku, x, y, i))//判断当前填法是否合法
         {
-            search(copy, order, i);
+            search(csudoku, order, i);//如果合法，则递归目标格子
         }
     }
     return -1;
