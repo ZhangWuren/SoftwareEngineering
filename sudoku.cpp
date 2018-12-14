@@ -6,6 +6,7 @@
 #include "time.h"
 using namespace std;
 FILE *fp;
+FILE *fpOutput;
 int resultNumber;
 
 class CRow
@@ -171,10 +172,37 @@ bool GenerateSudoku(char *csudokuNumber)
     return true;
 }
 
+void PrintSokudu(int sudoku[][9])
+{
+    for (int k = 0; k < 9; k++)
+    {
+        char rowString[19];
+        for (int i = 0, j = 0; i < 9; i++)
+        {
+            if (i != 8)
+            {
+                rowString[j] = sudoku[k][i] + '0';
+                rowString[j + 1] = ' ';
+                j += 2;
+            }
+            else
+            {
+                rowString[j] = sudoku[k][i] + '0';
+                rowString[j + 1] = '\0';
+            }
+        }
+        fputs(rowString, fpOutput);
+        if (k != 8)
+        {
+            fputc('\n', fpOutput);
+        }
+    }
+}
+
 bool search(int (*sudoku)[9], int order, int number)
 {
     int copy[9][9];
-    int *c = (int *)copy;
+    int *copyPoint = (int *)copy;
     int x = order / 9;
     int y = order % 9;
     for (int i = 0; i < 9; i++)
@@ -197,21 +225,14 @@ bool search(int (*sudoku)[9], int order, int number)
         return 0;
     }
 
-    while (*(c + order))
+    while (*(copyPoint + order))
     {
         order++;
 
         if (order > 80)
         {
             resultNumber++;
-            for (int i = 0; i < 9; i++)
-            {
-                for (int j = 0; j < 9; j++)
-                {
-                    cout << copy[i][j] << " ";
-                }
-                cout << endl;
-            }
+            PrintSokudu(copy);
             return 0;
         }
     }
@@ -234,9 +255,27 @@ bool SovleSudoku(char filename[])
     int inputSudokuArr[9][9];
     FILE *fpInput;
     fpInput = fopen(filename, "r");
-    FILE *fpOutput;
-    fpOutput = fopen("sudoku.txt", "w");
 
+    char ch;
+    for (int i = 0; i < 81;)
+    {
+        ch = fgetc(fpInput);
+        if (ch >= '0' && ch <= '9')
+        {
+            inputSudoku[i] = ch - '0';
+            i++;
+        }
+    }
+
+    for (int i = 0, k = 0; i < 9; i++)
+    {
+        for (int j = 0; j < 9; j++)
+        {
+            inputSudokuArr[i][j] = inputSudoku[k];
+            k++;
+        }
+    }
+    search(inputSudokuArr, -1, 0);
     while (1)
     {
         char ch;
@@ -265,8 +304,12 @@ bool SovleSudoku(char filename[])
                 k++;
             }
         }
+        fputc('\n', fpOutput);
+        fputc('\n', fpOutput);
         search(inputSudokuArr, -1, 0);
     }
+
+    fclose(fpInput);
     return true;
 }
 
@@ -275,6 +318,7 @@ int main(int argc, char *argv[])
     clock_t startT, finishT;
     double totalTime;
     startT = clock();
+    fpOutput = fopen("sudoku.txt", "w");
 
     cout << argv[1] << endl;
     if (!strcmp(argv[1], "-c"))
@@ -294,6 +338,7 @@ int main(int argc, char *argv[])
     }
 
     fclose(fp);
+    fclose(fpOutput);
     finishT = clock();
     totalTime = (double)(finishT - startT) / CLOCKS_PER_SEC;
     cout << "The total time is " << totalTime << "s!" << endl;
