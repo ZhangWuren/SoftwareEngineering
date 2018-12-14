@@ -199,7 +199,7 @@ void PrintSokudu(int sudoku[][9])
     }
 }
 
-bool search(int (*sudoku)[9], int order, int number)
+bool search(int sudoku[][9], int order, int number)
 {
     int copy[9][9];
     int *copyPoint = (int *)copy;
