@@ -7,7 +7,7 @@
 using namespace std;
 FILE *fp;
 FILE *fpOutput;
-int resultNumber;
+int searchFlag = 0;
 
 class CRow
 { //数独的一行
@@ -214,13 +214,13 @@ bool search(int (*sudoku)[9], int order, int number)
     }
 
     if (order < 0)
-        resultNumber = 0;
+        searchFlag = 0;
 
     if (order >= 0)
     {
         copy[x][y] = number;
     }
-    if (resultNumber >= 1)
+    if (searchFlag)
     {
         return 0;
     }
@@ -231,7 +231,7 @@ bool search(int (*sudoku)[9], int order, int number)
 
         if (order > 80)
         {
-            resultNumber++;
+            searchFlag = 1;
             PrintSokudu(copy);
             return 0;
         }
