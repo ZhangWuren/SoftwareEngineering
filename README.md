@@ -8,6 +8,7 @@ sudokuProject:
 功能：
 
 生成数独执行 sudoku [-c] 指定数量
+
 解数独 sudoku [-s] 绝对路径
 
 说明：
